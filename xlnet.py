@@ -112,12 +112,6 @@ class XLNetClassModel(XLNetPreTrainedModel):
         outputs = self.linear_proj(outputs)
         return outputs, pred_review
 
-def ids_cut(input_id):
-    # cut the head and tail of the sentence which count of words >= 510
-    input_id_head = input_id[0, :256]
-    input_id_tail = input_id[0, -256:]
-    return torch.cat((input_id_head, input_id_tail), dim=-1)
-
 class BertDataset(Dataset):
     def __init__(self, tokenizer, istrain=True) -> None:
         super().__init__()
@@ -137,8 +131,6 @@ class BertDataset(Dataset):
                 text = self.id_train[index] + ' ' +text
                 feature = tokenizer(text, max_length=512, truncation=True, padding='max_length', return_tensors='pt')
                 feature = {k:feature[k] for k in feature}
-                # if feature['input_ids'].size(1) > 510:
-                #     feature['input_ids'] = ids_cut(feature['input_ids'])
                 feature['labels'] = self.Y_train_split[index]
                 self.train_features.append(feature)
         else:
@@ -146,8 +138,6 @@ class BertDataset(Dataset):
                 text = self.id_test[index] + ' ' + text
                 feature = tokenizer(text, max_length=512, truncation=True, padding='max_length', return_tensors='pt')
                 feature = {k:feature[k] for k in feature}
-                # if feature['input_ids'].size(1) > 510:
-                #     feature['input_ids'] = ids_cut(feature['input_ids'])
                 feature['labels'] = self.Y_test_split[index]
                 self.test_features.append(feature)
         
@@ -250,8 +240,7 @@ def main(args):
     return best_acc
 
 def objective(trial):
-    # args.lr = trial.suggest_float("lr", 1e-5, 1e-4, log=True)
-    args.lr = 1.4e-5
+    args.lr = trial.suggest_float("lr", 1e-5, 1e-4, log=True)
     args.batch_size = trial.suggest_int('batch size', 10, 16)
     args.max_epoch = trial.suggest_int('max epoch', 10, 30)
 
@@ -266,11 +255,7 @@ def objective(trial):
         for key, value in trial.params.items():
             w.writelines("    {}: {} \n".format(key, value))
         w.writelines(str(best_acc))
-    # Params: 
-    # Value:  0.7013311386108398
-    # lr: 1.5581806256822673e-05
-    # batch size: 13
-    # max epoch: 30
+
     return best_acc
 
 def do_trial(args):
@@ -295,9 +280,7 @@ def do_trial(args):
 if __name__ == '__main__':
     (traintxt, trainrevid, trainY) = read_text_data("movierating_train.txt")
     (testtxt, testrevid, _)        = read_text_data("movierating_test.txt")
-    # (traintxt, trainrevid, trainY) = read_text_data("assignment1/movierating_train.txt")
-    # (testtxt, testrevid, _)        = read_text_data("assignment1/movierating_test.txt")
-    
+
     xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
     dataset_train = BertDataset(xlnet_tokenizer, istrain=True)
     dataset_test = BertDataset(xlnet_tokenizer, istrain=False)

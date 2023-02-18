@@ -1,0 +1,12 @@
+# Reviewers' rating prediction based on XLNet
+
+python version=3.8
+
+```bash
+! pip install transformers
+! pip install sentencepiece
+! pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+! pip install tqdm
+! pip install optuna
+! pip install scikit-learn
+```
