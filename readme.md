@@ -10,3 +10,8 @@ python version=3.8
 ! pip install optuna
 ! pip install scikit-learn
 ```
+
+Run:
+```bash
+python xlnet.py --experiment_name xlnet
+```
