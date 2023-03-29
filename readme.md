@@ -15,3 +15,17 @@ Run:
 ```bash
 python xlnet.py --experiment_name xlnet
 ```
+
+# Music Tagging
+
+## Musicnn
+Run:
+```bash
+python muicnn_tuning.py --experiment_name musicnn
+```
+
+## Audio Spectrogram Transformer
+Run:
+```bash
+python ast_tuning.py --experiment_name ast
+```
